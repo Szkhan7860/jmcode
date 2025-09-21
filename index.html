@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>JioMart Codes — Pay via Paytm</title>
+  <style>
+    :root{--accent:#0b74de;--bg:#0f1720;--card:#0b1220;--glass: rgba(255,255,255,0.04);}
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,'Helvetica Neue',Arial;color:#e6eef8;background:linear-gradient(180deg,#071026 0%, #081426 100%);}
+    .wrap{max-width:520px;margin:28px auto;padding:18px}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:14px;padding:18px;box-shadow:0 6px 24px rgba(2,6,23,0.6);}
+    h1{font-size:20px;margin:0 0 8px}
+    p.lead{margin:0 0 18px;color:#a9c2dd;font-size:13px}
+
+    .row{display:flex;gap:12px;align-items:center}
+    label{font-size:13px;color:#bcd6f2}
+    input[type=number]{width:100%;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:var(--glass);color:inherit;font-size:16px}
+    .muted{font-size:13px;color:#9fb6d8}
+
+    .summary{margin-top:16px;padding:12px;border-radius:10px;background:rgba(255,255,255,0.02);display:flex;justify-content:space-between;align-items:center}
+    .price{font-weight:700;font-size:18px}
+    .note{font-size:12px;color:#9fb6d8}
+
+    .btn{display:inline-block;padding:10px 16px;border-radius:10px;background:var(--accent);color:white;text-decoration:none;font-weight:600;margin-top:12px;text-align:center}
+    .btn-paytm{background:#01baf2}
+    .btn-secondary{background:#2d3748}
+
+    .qr-wrap{text-align:center;margin-top:16px}
+    .qr-wrap img{width:220px;height:220px;border-radius:8px;background:#fff;padding:8px}
+
+    @media (max-width:420px){.btn{width:100%}.qr-wrap img{width:180px;height:180px}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>JioMart Code — Pay via Paytm</h1>
+      <p class="lead">Each JioMart code = <strong>₹15</strong>. Enter how many codes you want and pay using Paytm.</p>
+
+      <div>
+        <label for="count">How many codes do you need?</label>
+        <div style="margin-top:8px" class="row">
+          <input id="count" type="number" min="1" inputmode="numeric" pattern="[0-9]*" placeholder="Enter quantity (e.g. 15)" />
+        </div>
+        <div style="margin-top:8px" class="muted">Price per code: <strong>₹15</strong></div>
+      </div>
+
+      <div class="summary" id="summary" aria-live="polite">
+        <div>
+          <div class="note">Quantity</div>
+          <div id="displayQty">0</div>
+        </div>
+        <div style="text-align:right">
+          <div class="note">Total to pay</div>
+          <div class="price" id="displayTotal">₹0</div>
+        </div>
+      </div>
+
+      <div id="paymentSection" style="display:none">
+        <div class="qr-wrap">
+          <div class="note">Scan this QR to pay</div>
+          <img id="qrImage" src="qr.png" alt="Paytm QR" />
+        </div>
+        <a id="paytmBtn" class="btn btn-paytm" href="#">Pay using Paytm Directly</a>
+        <a id="completeBtn" class="btn btn-secondary" href="#">Complete Payment</a>
+      </div>
+
+      <div id="msg" style="margin-top:12px;color:#b3d4ff;font-size:13px"></div>
+    </div>
+  </div>
+
+  <script>
+    const PRICE = 15;
+    const countEl = document.getElementById('count');
+    const displayQty = document.getElementById('displayQty');
+    const displayTotal = document.getElementById('displayTotal');
+    const paytmBtn = document.getElementById('paytmBtn');
+    const completeBtn = document.getElementById('completeBtn');
+    const paymentSection = document.getElementById('paymentSection');
+    const msg = document.getElementById('msg');
+
+    function formatINR(n){ return '₹' + n.toLocaleString('en-IN'); }
+
+    function update(){
+      let q = parseInt(countEl.value,10);
+      if(!Number.isFinite(q) || q <= 0){
+        q = 0;
+      }
+      const total = q * PRICE;
+      displayQty.textContent = q;
+      displayTotal.textContent = formatINR(total);
+
+      if(q > 0){
+        paymentSection.style.display = 'block';
+        const upiLink = `upi://pay?pa=szcamps-1@okaxis&pn=Mohd%20Shahnawaz&am=${total}&cu=INR`;
+        paytmBtn.href = upiLink;
+      } else {
+        paymentSection.style.display = 'none';
+        msg.textContent = '';
+      }
+    }
+
+    countEl.addEventListener('input', update);
+    countEl.addEventListener('change', update);
+
+    completeBtn.addEventListener('click', (e)=>{
+      e.preventDefault();
+      msg.textContent = '✅ Payment marked complete. Please send your UTR and payment screenshot to @Sukuna_Verified on Telegram to receive your codes.';
+    });
+
+    window.addEventListener('load', ()=>{ countEl.focus(); });
+  </script>
+</body>
+  </html>
